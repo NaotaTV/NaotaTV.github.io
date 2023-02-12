@@ -7,14 +7,14 @@ May Be Entered.">
 
 <meta name="keywords" content="Naotacord">
 </head> 
-<body vlink="#66cccc" text="#33ffcc" link="#cc99ff" bgcolor="#000000" background="file:///C|/Users/Jay/Downloads/heavensgate/tile.jpg" alink="#ff0066"> 
+<body vlink="#66cccc" text="#33ffcc" link="#cc99ff" bgcolor="#000000" background="tile.jpg" alink="#ff0066"> 
 <center>
-<img src="file:///C|/Users/Jay/Downloads/heavensgate/redalrt3.gif" alt="Red Alert --">
+<img src="redalrt3.gif" alt="Red Alert --">
 <br>
 <font size="6"><font color="#ff0000">Discord</font>
 <font color="#66ffff"> Brings Closure to:</font></font>
 
-<img src="file:///C|/Users/Jay/Downloads/heavensgate/banner.png" alt="Welcome" to="" heaven's="" gate="" align="middle">
+<img src="banner.png" alt="Welcome" to="" heaven's="" gate="" align="middle">
 <a name="top"></a>
 <br>
 <table width="92%" border="0"><tbody><tr>
@@ -35,33 +35,33 @@ on Our Website</strong></font>
 <a name="keys"></a>
 <hr width="80%" size="1">
 <table width="100%" cellpadding="0" border="0"><tbody><tr>
-<td><a href="file:///C|/Users/Jay/Downloads/heavensgate/misc/intro.htm">
-<img src="file:///C|/Users/Jay/Downloads/heavensgate/bttn1.jpg" alt="Discord Invite" hspace="25" border="0" align="absmiddle"></a></td>
+<td><a href="misc/intro.htm">
+<img src="bttn1.jpg" alt="Discord Invite" hspace="25" border="0" align="absmiddle"></a></td>
 <td valign="middle"><font size="5"><strong><a href="https://discord.com/invite/flcl">Discord Invite</a></strong></font><strong> <font size="4">
 <font color="#ccffff"><em>&nbsp;</em> </font>
 </font></font></strong></td>
 </tr><tr>
-<td><a href="file:///C|/Users/Jay/Downloads/heavensgate/misc/95upd96.htm"><img src="file:///C|/Users/Jay/Downloads/heavensgate/bttn2.jpg" alt="Statement by an E.T." hspace="25" border="0" align="absmiddle"></a></td>
+<td><a href="misc/95upd96.htm"><img src="bttn2.jpg" alt="Statement by an E.T." hspace="25" border="0" align="absmiddle"></a></td>
 <td valign="middle"><font size="5"><strong><a href="https://www.youtube.com/watch?v=0G1HkJIoHBg&feature=youtu.be">Statement by 
 Scoutie</a></strong></font><strong> <font size="4" color="#ccffff"><em>
 (excerpt from our book)</em></font></strong></td>
 </tr><tr>
 
-<td><a href="file:///C|/Users/Jay/Downloads/heavensgate/misc/ovrview.htm"><img src="file:///C|/Users/Jay/Downloads/heavensgate/bttn3.jpg" alt="Overview of Present Mission" hspace="25" border="0" align="absmiddle"></a><br></td>
+<td><a href="misc/ovrview.htm"><img src="bttn3.jpg" alt="Overview of Present Mission" hspace="25" border="0" align="absmiddle"></a><br></td>
 <td valign="middle"><font size="5"><strong>
 <a href="https://zoro.to/watch/puella-magi-madoka-magica-155?ep=4063">Overview of Gunboi</a><a> </a><a href="https://zoro.to/watch/puella-magi-madoka-magica-155?ep=4063"></a></strong></font><strong> 
 <font size="4" color="#ccffff"><em>&nbsp;</em>
 </font></strong></td>
 </tr><tr>
 
-<td><a href="file:///C|/Users/Jay/Downloads/heavensgate/misc/lastchnc.htm"><img src="file:///C|/Users/Jay/Downloads/heavensgate/bttn4.jpg" alt="Last Chance To Advance Beyond Human" hspace="25" border="0" align="absmiddle"></a>
+<td><a href="misc/lastchnc.htm"><img src="bttn4.jpg" alt="Last Chance To Advance Beyond Human" hspace="25" border="0" align="absmiddle"></a>
 <br></td><td valign="middle"><font size="5"><strong>
 <a href="https://www.youtube.com/watch?v=jNQXAC9IVRw">Last Chance To Advance Beyond Human</a> </strong></font><strong> 
 <font size="4" color="#ccffff"><em>(Me at the Zoo)</em></font></strong>
 </td>
 </tr><tr>
 
-<td><a href="file:///C|/Users/Jay/Downloads/heavensgate/misc/latest.htm"><img src="file:///C|/Users/Jay/Downloads/heavensgate/bttn6.jpg" alt="Transcripts of 2 videos" hspace="25" border="0" align="absmiddle"></a><br></td>
+<td><a href="misc/latest.htm"><img src="bttn6.jpg" alt="Transcripts of 2 videos" hspace="25" border="0" align="absmiddle"></a><br></td>
 <td valign="middle"><font size="5"><strong><a href="https://www.youtube.com/watch?v=xcmX0kn09V0">Video  
 of beverage of the gods</a></strong></font></td>
 </tr><tr>
@@ -71,7 +71,7 @@ of beverage of the gods</a></strong></font></td>
 
 
 </tr></tbody></table>
-<br><img src="file:///C|/Users/Jay/Downloads/heavensgate/srhg.png" alt="Saturn Rings" hspace="10" border="0" align="right">
+<br><img src="srhg.png" alt="Saturn Rings" hspace="10" border="0" align="right">
 <strong>
 <font color="#ffcc66">&nbsp;</font></strong></p><p><strong>
 
