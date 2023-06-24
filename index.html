@@ -3,75 +3,6 @@
 
 
 
-<html>
-<head>
-  <title>Naotacord</title>
-  <style>
-    #stars-container {
-      position: relative;
-      width: 100%;
-      height: 100vh;
-      overflow: hidden;
-      background-color: black;
-    }
-    
-    .star {
-      position: absolute;
-      width: 1px; /* Adjust the star size as needed */
-      height: 1px; /* Adjust the star size as needed */
-      border-radius: 50%;
-      animation: blink 1s infinite;
-    }
-    
-    @keyframes blink {
-      50% {
-        opacity: 0;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div id="stars-container"></div>
-  
-  <script>
-    function createStars() {
-      const container = document.getElementById("stars-container");
-      const numStars = 100; // Number of stars to create
-      
-      const colors = ["red", "white", "green"]; // Array of star colors
-      
-      for (let i = 0; i < numStars; i++) {
-        const star = document.createElement("div");
-        star.className = "star";
-        star.style.left = `${getRandomPosition()}%`;
-        star.style.top = `${getRandomPosition()}%`;
-        star.style.backgroundColor = colors[getRandomIndex(colors)];
-        star.style.animationDelay = `${getRandomDelay()}s`;
-        container.appendChild(star);
-      }
-    }
-    
-    function getRandomPosition() {
-      const min = 0;
-      const max = 100; // Adjust the maximum value based on your container size
-      return Math.random() * (max - min) + min;
-    }
-    
-    function getRandomIndex(array) {
-      return Math.floor(Math.random() * array.length);
-    }
-    
-    function getRandomDelay() {
-      const min = 0;
-      const max = 2; // Adjust the maximum delay value as needed
-      return Math.random() * (max - min) + min;
-    }
-    
-    createStars();
-  </script>
-</body>
-</html>
-
 
 
 
@@ -156,6 +87,75 @@ of beverage of the gods</a></strong></font></td>
 <br>
 <hr width="85%" size="1" align="center">
 <font size="7" color="#ff0099">
+
+<html>
+<head>
+  <title>Naotacord</title>
+  <style>
+    #stars-container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      background-color: black;
+    }
+    
+    .star {
+      position: absolute;
+      width: 1px; /* Adjust the star size as needed */
+      height: 1px; /* Adjust the star size as needed */
+      border-radius: 50%;
+      animation: blink 1s infinite;
+    }
+    
+    @keyframes blink {
+      50% {
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="stars-container"></div>
+  
+  <script>
+    function createStars() {
+      const container = document.getElementById("stars-container");
+      const numStars = 100; // Number of stars to create
+      
+      const colors = ["red", "white", "green"]; // Array of star colors
+      
+      for (let i = 0; i < numStars; i++) {
+        const star = document.createElement("div");
+        star.className = "star";
+        star.style.left = `${getRandomPosition()}%`;
+        star.style.top = `${getRandomPosition()}%`;
+        star.style.backgroundColor = colors[getRandomIndex(colors)];
+        star.style.animationDelay = `${getRandomDelay()}s`;
+        container.appendChild(star);
+      }
+    }
+    
+    function getRandomPosition() {
+      const min = 0;
+      const max = 100; // Adjust the maximum value based on your container size
+      return Math.random() * (max - min) + min;
+    }
+    
+    function getRandomIndex(array) {
+      return Math.floor(Math.random() * array.length);
+    }
+    
+    function getRandomDelay() {
+      const min = 0;
+      const max = 2; // Adjust the maximum delay value as needed
+      return Math.random() * (max - min) + min;
+    }
+    
+    createStars();
+  </script>
+</body>
+</html>
 
 
 
