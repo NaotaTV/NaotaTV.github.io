@@ -8,6 +8,11 @@ function getRandomColor() {
   return color;
 }
 
+// Function to generate random blinking durations
+function getRandomDuration() {
+  return Math.random() * 3 + 1; // Random duration between 1 and 4 seconds
+}
+
 // Function to create twinkling stars
 function createStar() {
   var star = document.createElement('div');
@@ -15,6 +20,7 @@ function createStar() {
   star.style.top = Math.random() * window.innerHeight + 'px';
   star.style.left = Math.random() * window.innerWidth + 'px';
   star.style.backgroundColor = getRandomColor();
+  star.style.animationDuration = getRandomDuration() + 's';
   document.body.appendChild(star);
 }
 
