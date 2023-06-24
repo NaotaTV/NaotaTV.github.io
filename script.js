@@ -22,6 +22,11 @@ function createStar() {
   star.style.backgroundColor = getRandomColor();
   star.style.animationDuration = getRandomDuration() + 's';
   document.body.appendChild(star);
+
+  // Remove star after 5 seconds
+  setTimeout(function() {
+    star.remove();
+  }, 5000);
 }
 
 // Create stars at random intervals
