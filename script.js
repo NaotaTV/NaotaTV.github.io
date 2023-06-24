@@ -1,33 +1,31 @@
-// Function to generate random colors
-function getRandomColor() {
-  var letters = '0123456789ABCDEF';
-  var color = '#';
-  for (var i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)];
+function createStars() {
+  const container = document.getElementById("stars-container");
+  const numStars = 50; // Number of stars to create
+
+  for (let i = 0; i < numStars; i++) {
+    const star = document.createElement("div");
+    star.className = "star";
+    star.style.left = `${getRandomPosition()}px`;
+    star.style.top = `${getRandomPosition()}px`;
+    star.style.animationDelay = `${getRandomDelay()}s`;
+    container.appendChild(star);
   }
-  return color;
+
+  setTimeout(() => {
+    container.innerHTML = ""; // Clear the stars after 3 seconds
+  }, 3000);
 }
 
-// Function to generate random blinking durations
-function getRandomDuration() {
-  return Math.random() * 3 + 1; // Random duration between 1 and 4 seconds
+function getRandomPosition() {
+  const min = 0;
+  const max = 500; // Adjust the maximum value based on your container size
+  return Math.random() * (max - min) + min;
 }
 
-// Function to create twinkling stars
-function createStar() {
-  var star = document.createElement('div');
-  star.className = 'star';
-  star.style.top = Math.random() * window.innerHeight + 'px';
-  star.style.left = Math.random() * window.innerWidth + 'px';
-  star.style.backgroundColor = getRandomColor();
-  star.style.animationDuration = getRandomDuration() + 's';
-  document.body.appendChild(star);
-
-  // Remove star after 5 seconds
-  setTimeout(function() {
-    star.remove();
-  }, 5000);
+function getRandomDelay() {
+  const min = 0;
+  const max = 2; // Adjust the maximum delay value as needed
+  return Math.random() * (max - min) + min;
 }
 
-// Create stars at random intervals
-setInterval(createStar, 2000);
+createStars();
