@@ -1004,6 +1004,18 @@ a:focus-visible {
   accent-color: var(--green);
 }
 
+.radio-youtube-frame {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  z-index: 0;
+  width: 1px;
+  height: 1px;
+  border: 0;
+  opacity: 0.01;
+  pointer-events: none;
+}
+
 .radio-list {
   display: grid;
   gap: 8px;
