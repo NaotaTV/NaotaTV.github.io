@@ -126,6 +126,8 @@
 
       <div class="radio-player" aria-live="polite">
         <div class="radio-shell">
+          <div class="radio-antenna" aria-hidden="true"></div>
+          <div class="radio-orb" aria-hidden="true"></div>
           <div class="radio-screen">
             <div class="radio-lcd">
               <span class="radio-kicker">NOW TUNING</span>
@@ -138,8 +140,11 @@
             </div>
 
             <div class="wire-visualizer" aria-hidden="true">
-              <span></span><span></span><span></span><span></span><span></span><span></span>
-              <span></span><span></span><span></span><span></span><span></span><span></span>
+              <canvas id="radio-visualizer" width="420" height="160"></canvas>
+              <div class="wire-bars">
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
             </div>
           </div>
 

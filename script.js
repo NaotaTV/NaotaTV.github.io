@@ -10,6 +10,7 @@
   var fallbackHonorable = { id: "lovesilks", username: "lovesilks", rank: 6, status: "HONORABLE TRANSMISSION" };
   var radioTracks = [];
   var selectedRadioIndex = 0;
+  var apiOffline = false;
 
   function randomPercent() {
     return Math.random() * 100;
@@ -156,6 +157,9 @@
 
     renderDigitCounter(counter, entries.length ? total : null);
     empty.hidden = entries.length > 0;
+    empty.textContent = apiOffline
+      ? "Lain API tunnel is not connected yet. Fallback display is active."
+      : "Lainbot counter feed is not connected yet. No live statistics are being shown.";
     rows.innerHTML = entries.map(function (entry, index) {
       var rank = entry.rank || index + 1;
       var details = buildCounterDetails(entry);
@@ -202,10 +206,12 @@
 
     radioTracks = Array.isArray(data.tracks) ? data.tracks.slice(0, 20) : [];
     selectedRadioIndex = 0;
-    player.classList.toggle("is-active", radioTracks.length > 0);
+    player.classList.add("is-active");
 
     if (!radioTracks.length) {
-      list.innerHTML = '<li class="radio-empty">Lainbot radio has not received any single-song requests under 10 minutes yet.</li>';
+      list.innerHTML = '<li class="radio-empty">' + (apiOffline
+        ? "Lain API tunnel is offline. The player is ready and waiting for lainapi.naotacord.com."
+        : "Lainbot radio has not received any single-song requests under 10 minutes yet.") + '</li>';
       updateRadioDisplay();
       return;
     }
@@ -351,10 +357,62 @@
     }
   }
 
+  function startRadioVisualizer() {
+    var canvas = document.getElementById("radio-visualizer");
+    if (!canvas || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
+
+    var context = canvas.getContext("2d");
+    if (!context) {
+      return;
+    }
+
+    function draw(time) {
+      var width = canvas.width;
+      var height = canvas.height;
+      context.clearRect(0, 0, width, height);
+      context.lineWidth = 1;
+      context.strokeStyle = "rgba(51, 255, 204, 0.72)";
+      context.shadowColor = "rgba(51, 255, 204, 0.65)";
+      context.shadowBlur = 8;
+
+      var centerY = height * 0.48;
+      var points = 18;
+      for (var row = 0; row < 6; row += 1) {
+        context.beginPath();
+        for (var i = 0; i <= points; i += 1) {
+          var x = (i / points) * width;
+          var wave = Math.sin(i * 0.9 + time * 0.003 + row * 0.72);
+          var depth = Math.cos(i * 0.42 + time * 0.0016);
+          var y = centerY + wave * (10 + row * 4) + (row - 2.5) * 13 + depth * 8;
+          if (i === 0) context.moveTo(x, y);
+          else context.lineTo(x, y);
+        }
+        context.stroke();
+      }
+
+      context.shadowBlur = 0;
+      context.strokeStyle = "rgba(255, 204, 102, 0.44)";
+      for (var col = 0; col <= 8; col += 1) {
+        var xLine = (col / 8) * width;
+        context.beginPath();
+        context.moveTo(xLine, 12);
+        context.lineTo(width / 2 + (xLine - width / 2) * 0.2, height - 12);
+        context.stroke();
+      }
+
+      window.requestAnimationFrame(draw);
+    }
+
+    window.requestAnimationFrame(draw);
+  }
+
   function loadSocialStats() {
     fetchJson("/api/social/friends")
       .then(renderFriends)
       .catch(function () {
+        apiOffline = true;
         renderFriends({ friends: fallbackFriends, honorable: fallbackHonorable });
       })
       .finally(setupRevealEffects);
@@ -362,12 +420,14 @@
     fetchJson("/api/social/word-counter")
       .then(renderCounter)
       .catch(function () {
+        apiOffline = true;
         renderCounter({ total: null, entries: [] });
       });
 
     fetchJson("/api/social/radio")
       .then(renderRadio)
       .catch(function () {
+        apiOffline = true;
         renderRadio({ tracks: [] });
       });
   }
@@ -376,6 +436,7 @@
     createStars();
     setupCounterRows();
     setupRadioControls();
+    startRadioVisualizer();
     loadSocialStats();
   }
 
