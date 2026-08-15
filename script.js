@@ -8,6 +8,8 @@
     { id: "eclibes", username: "eclibes", rank: 5, status: "SIGNAL RECEIVED" }
   ];
   var fallbackHonorable = { id: "lovesilks", username: "lovesilks", rank: 6, status: "HONORABLE TRANSMISSION" };
+  var radioTracks = [];
+  var selectedRadioIndex = 0;
 
   function randomPercent() {
     return Math.random() * 100;
@@ -191,6 +193,94 @@
     }).join("");
   }
 
+  function renderRadio(data) {
+    var player = document.querySelector(".radio-player");
+    var list = document.getElementById("radio-list");
+    if (!player || !list) {
+      return;
+    }
+
+    radioTracks = Array.isArray(data.tracks) ? data.tracks.slice(0, 20) : [];
+    selectedRadioIndex = 0;
+    player.classList.toggle("is-active", radioTracks.length > 0);
+
+    if (!radioTracks.length) {
+      list.innerHTML = '<li class="radio-empty">Lainbot radio has not received any single-song requests under 10 minutes yet.</li>';
+      updateRadioDisplay();
+      return;
+    }
+
+    list.innerHTML = radioTracks.map(function (track, index) {
+      return '<li>' +
+        '<button class="radio-track' + (index === 0 ? " is-selected" : "") + '" type="button" data-radio-index="' + index + '">' +
+          '<span class="radio-track-index">' + String(index + 1).padStart(2, "0") + '</span>' +
+          '<span>' +
+            '<span class="radio-track-title">' + escapeHtml(track.title || "Untitled Signal") + '</span>' +
+            '<span class="radio-track-artist">' + escapeHtml(track.artist || "Unknown Artist") + '</span>' +
+          '</span>' +
+          '<span class="radio-track-duration">' + formatDuration(track.durationMs) + '</span>' +
+        '</button>' +
+      '</li>';
+    }).join("");
+    updateRadioDisplay();
+  }
+
+  function updateRadioDisplay() {
+    var title = document.getElementById("radio-title");
+    var artist = document.getElementById("radio-artist");
+    var duration = document.getElementById("radio-duration");
+    var source = document.getElementById("radio-source");
+    var open = document.getElementById("radio-open");
+    var prev = document.getElementById("radio-prev");
+    var next = document.getElementById("radio-next");
+    var selected = radioTracks[selectedRadioIndex];
+
+    document.querySelectorAll(".radio-track").forEach(function (button) {
+      button.classList.toggle("is-selected", Number(button.getAttribute("data-radio-index")) === selectedRadioIndex);
+    });
+
+    if (!selected) {
+      if (title) title.textContent = "Awaiting signal";
+      if (artist) artist.textContent = "Lainbot radio feed offline";
+      if (duration) duration.textContent = "00:00";
+      if (source) source.textContent = "EARTH NODE";
+      if (open) {
+        open.setAttribute("aria-disabled", "true");
+        open.removeAttribute("href");
+      }
+      if (prev) prev.setAttribute("disabled", "");
+      if (next) next.setAttribute("disabled", "");
+      return;
+    }
+
+    if (title) title.textContent = selected.title || "Untitled Signal";
+    if (artist) artist.textContent = selected.artist || "Unknown Artist";
+    if (duration) duration.textContent = formatDuration(selected.durationMs);
+    if (source) source.textContent = (selected.sourceName || "Lainbot").toUpperCase();
+    if (open) {
+      if (selected.uri) {
+        open.href = selected.uri;
+        open.setAttribute("aria-disabled", "false");
+      } else {
+        open.setAttribute("aria-disabled", "true");
+        open.removeAttribute("href");
+      }
+    }
+    if (prev) prev.toggleAttribute("disabled", radioTracks.length < 2);
+    if (next) next.toggleAttribute("disabled", radioTracks.length < 2);
+  }
+
+  function formatDuration(durationMs) {
+    if (typeof durationMs !== "number" || durationMs <= 0) {
+      return "00:00";
+    }
+
+    var totalSeconds = Math.round(durationMs / 1000);
+    var minutes = Math.floor(totalSeconds / 60);
+    var seconds = totalSeconds % 60;
+    return String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
+  }
+
   function setupRevealEffects() {
     var targets = Array.prototype.slice.call(document.querySelectorAll(".reveal, .friend-card"));
     if (!("IntersectionObserver" in window)) {
@@ -227,6 +317,40 @@
     });
   }
 
+  function setupRadioControls() {
+    var list = document.getElementById("radio-list");
+    var prev = document.getElementById("radio-prev");
+    var next = document.getElementById("radio-next");
+
+    if (list) {
+      list.addEventListener("click", function (event) {
+        var button = event.target.closest(".radio-track");
+        if (!button) {
+          return;
+        }
+
+        selectedRadioIndex = Number(button.getAttribute("data-radio-index")) || 0;
+        updateRadioDisplay();
+      });
+    }
+
+    if (prev) {
+      prev.addEventListener("click", function () {
+        if (!radioTracks.length) return;
+        selectedRadioIndex = (selectedRadioIndex - 1 + radioTracks.length) % radioTracks.length;
+        updateRadioDisplay();
+      });
+    }
+
+    if (next) {
+      next.addEventListener("click", function () {
+        if (!radioTracks.length) return;
+        selectedRadioIndex = (selectedRadioIndex + 1) % radioTracks.length;
+        updateRadioDisplay();
+      });
+    }
+  }
+
   function loadSocialStats() {
     fetchJson("/api/social/friends")
       .then(renderFriends)
@@ -240,11 +364,18 @@
       .catch(function () {
         renderCounter({ total: null, entries: [] });
       });
+
+    fetchJson("/api/social/radio")
+      .then(renderRadio)
+      .catch(function () {
+        renderRadio({ tracks: [] });
+      });
   }
 
   function init() {
     createStars();
     setupCounterRows();
+    setupRadioControls();
     loadSocialStats();
   }
 
