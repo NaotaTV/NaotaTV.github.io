@@ -86,7 +86,7 @@ a:focus-visible {
 .site-shell {
   position: relative;
   z-index: 1;
-  max-width: 1100px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 24px clamp(16px, 4vw, 48px) 40px;
 }
@@ -221,6 +221,87 @@ a:focus-visible {
   content: "";
 }
 
+.signal-dashboard {
+  display: grid;
+  grid-template-columns: minmax(360px, 1.12fr) minmax(290px, 0.88fr);
+  gap: 24px;
+  align-items: start;
+  margin: 42px auto;
+}
+
+.signal-dashboard .radio-transmissions,
+.signal-dashboard .social-transmissions {
+  height: 100%;
+  margin: 0;
+}
+
+.dashboard-panel {
+  overflow: hidden;
+}
+
+.radio-side {
+  grid-column: 1;
+}
+
+.friends-side {
+  grid-column: 2;
+}
+
+.friends-side .section-console {
+  margin-bottom: 16px;
+}
+
+.friends-side .cosmic-title {
+  font-size: clamp(22px, 2.5vw, 30px);
+}
+
+.friends-side .friend-grid {
+  grid-template-columns: 1fr;
+  max-height: 980px;
+  padding-right: 5px;
+  overflow: auto;
+}
+
+.friends-side .friend-card,
+.friends-side .friend-card.primary,
+.friends-side .friend-card:nth-child(2),
+.friends-side .friend-card:nth-child(3),
+.friends-side .friend-card:nth-child(4),
+.friends-side .friend-card:nth-child(5) {
+  grid-column: auto;
+  min-height: auto;
+}
+
+.friends-side .friend-card {
+  grid-template-columns: auto 1fr;
+  column-gap: 14px;
+  align-items: center;
+  padding: 14px;
+}
+
+.friends-side .rank-label,
+.friends-side .status-badge,
+.friends-side .friend-meta,
+.friends-side .stat-line {
+  grid-column: 1 / -1;
+}
+
+.friends-side .friend-avatar {
+  grid-row: 2 / span 2;
+  width: 64px;
+  height: 64px;
+  margin: 0;
+}
+
+.friends-side .friend-name {
+  text-align: left;
+  font-size: 21px;
+}
+
+.friends-side .status-badge {
+  justify-self: start;
+}
+
 .section-console {
   margin-bottom: 22px;
   text-align: center;
@@ -326,6 +407,42 @@ a:focus-visible {
     #050614;
   color: #ccffff;
   font-family: Consolas, "Courier New", monospace;
+  isolation: isolate;
+}
+
+.generated-avatar {
+  position: relative;
+  background:
+    radial-gradient(circle at 50% 30%, hsla(var(--avatar-hue, 186), 100%, 76%, 0.88), transparent 18%),
+    radial-gradient(circle at 34% 42%, rgba(255, 255, 255, 0.82) 0 3px, transparent 4px),
+    radial-gradient(circle at 66% 42%, rgba(255, 255, 255, 0.82) 0 3px, transparent 4px),
+    radial-gradient(circle at 50% 84%, hsla(calc(var(--avatar-hue, 186) + 84), 100%, 66%, 0.46), transparent 32%),
+    linear-gradient(145deg, #030510, hsl(var(--avatar-hue, 186), 78%, 18%));
+  text-shadow: 0 0 6px rgba(102, 255, 255, 0.85);
+  box-shadow:
+    inset 0 0 16px rgba(255, 255, 255, 0.08),
+    0 0 18px hsla(var(--avatar-hue, 186), 100%, 66%, 0.22);
+}
+
+.generated-avatar::before {
+  position: absolute;
+  inset: 10%;
+  z-index: -1;
+  border: 1px dashed rgba(255, 255, 255, 0.22);
+  border-radius: inherit;
+  content: "";
+  animation: avatarOrbit 1800ms linear infinite;
+}
+
+.generated-avatar span {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes avatarOrbit {
+  to {
+    transform: rotate(1turn);
+  }
 }
 
 .friend-avatar {
@@ -522,91 +639,134 @@ a:focus-visible {
 
 .radio-player {
   display: grid;
-  grid-template-columns: minmax(300px, 460px) 1fr;
-  gap: 22px;
+  gap: 18px;
   align-items: stretch;
 }
 
 .radio-shell {
   position: relative;
-  min-height: 390px;
-  padding: 26px 22px 20px 70px;
-  border: 2px solid rgba(102, 255, 255, 0.62);
-  border-radius: 38% 18% 34% 18% / 18% 34% 18% 38%;
+  min-height: 520px;
+  padding: clamp(14px, 2vw, 22px);
+  border: 1px solid rgba(102, 255, 255, 0.5);
+  border-radius: 28px;
   background:
-    radial-gradient(circle at 88% 18%, rgba(255, 148, 32, 0.92), transparent 30px),
-    radial-gradient(circle at 12% 80%, rgba(51, 255, 204, 0.34), transparent 52px),
-    radial-gradient(circle at 50% 115%, rgba(204, 153, 255, 0.22), transparent 70px),
-    linear-gradient(145deg, #29323a, #050608 56%, #2f271d);
+    radial-gradient(circle at 82% 20%, rgba(172, 93, 255, 0.22), transparent 96px),
+    radial-gradient(circle at 18% 76%, rgba(51, 255, 204, 0.18), transparent 120px),
+    linear-gradient(145deg, rgba(7, 10, 15, 0.92), rgba(0, 0, 0, 0.9));
   box-shadow:
-    inset 10px 12px 24px rgba(255, 255, 255, 0.1),
-    inset -18px -20px 24px rgba(0, 0, 0, 0.52),
-    0 0 28px rgba(102, 255, 255, 0.18);
+    inset 0 0 32px rgba(102, 255, 255, 0.08),
+    0 0 30px rgba(102, 255, 255, 0.16);
+}
+
+.radio-shell::before,
+.radio-shell::after {
+  position: absolute;
+  pointer-events: none;
+  content: "";
 }
 
 .radio-shell::before {
-  position: absolute;
-  left: 18px;
-  top: 94px;
-  width: 42px;
-  height: 190px;
-  border: 1px solid rgba(167, 255, 181, 0.42);
-  border-radius: 999px;
-  background:
-    repeating-radial-gradient(circle, rgba(167, 255, 181, 0.42) 0 2px, transparent 3px 9px),
-    rgba(0, 0, 0, 0.32);
-  box-shadow: inset 0 0 22px rgba(0, 0, 0, 0.75), 0 0 18px rgba(51, 255, 204, 0.1);
-  content: "";
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(120deg, transparent 0 38%, rgba(255, 255, 255, 0.08) 45%, transparent 52% 100%);
+  mix-blend-mode: screen;
+  transform: translateX(-45%);
+  animation: consoleSweep 4200ms ease-in-out infinite;
 }
 
 .radio-shell::after {
-  position: absolute;
-  right: 30px;
-  top: 26px;
-  width: 34px;
-  height: 34px;
-  border: 2px solid rgba(255, 204, 102, 0.72);
-  border-radius: 50%;
-  background: radial-gradient(circle, #ffb33c 0 28%, #e06500 34% 60%, #160b03 64%);
-  box-shadow: 0 0 16px rgba(255, 148, 32, 0.42), inset 0 0 9px rgba(255, 255, 255, 0.28);
-  content: "";
+  inset: 10px;
+  border: 1px dashed rgba(204, 153, 255, 0.18);
+  border-radius: 22px;
 }
 
-.radio-antenna {
-  position: absolute;
-  left: 88px;
-  top: -48px;
-  width: 2px;
-  height: 70px;
-  background: linear-gradient(to top, rgba(102, 255, 255, 0.18), rgba(255, 255, 255, 0.78));
-  transform: rotate(-22deg);
-  transform-origin: bottom;
+.radio-art-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 280px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  border-radius: 22px;
+  background:
+    radial-gradient(ellipse at center, rgba(102, 255, 255, 0.12), transparent 62%),
+    #020204;
 }
 
-.radio-antenna::before {
-  position: absolute;
-  top: -6px;
-  left: -5px;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--gold);
-  box-shadow: 0 0 14px var(--gold);
-  content: "";
+.radio-console-image {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: min(100%, 850px);
+  height: auto;
+  filter: drop-shadow(0 0 20px rgba(102, 255, 255, 0.24)) drop-shadow(0 0 22px rgba(164, 86, 255, 0.22));
+  transform-origin: 50% 58%;
+  animation: consoleFloat 3200ms ease-in-out infinite;
 }
 
-.radio-orb {
+.radio-console-scan,
+.radio-console-glow {
   position: absolute;
-  right: 28px;
-  bottom: 22px;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #ffffff, #91c8ff 38%, #18202b 70%);
-  box-shadow: 0 0 12px rgba(145, 200, 255, 0.45);
+  inset: 0;
+  pointer-events: none;
+}
+
+.radio-console-scan {
+  z-index: 2;
+  background:
+    repeating-linear-gradient(0deg, rgba(102, 255, 255, 0.12) 0 1px, transparent 1px 5px),
+    linear-gradient(90deg, transparent, rgba(204, 153, 255, 0.16), transparent);
+  opacity: 0.5;
+  mix-blend-mode: screen;
+  animation: consoleScan 900ms linear infinite;
+}
+
+.radio-console-glow {
+  z-index: 0;
+  background:
+    radial-gradient(circle at 82% 57%, rgba(255, 134, 0, 0.22), transparent 12%),
+    radial-gradient(circle at 45% 42%, rgba(51, 255, 204, 0.24), transparent 22%),
+    radial-gradient(circle at 68% 40%, rgba(170, 84, 255, 0.34), transparent 18%);
+  filter: blur(16px);
+  animation: consoleGlow 1100ms ease-in-out infinite alternate;
+}
+
+@keyframes consoleFloat {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+
+  50% {
+    transform: translateY(-4px) scale(1.006);
+  }
+}
+
+@keyframes consoleScan {
+  to {
+    background-position: 0 10px, 140px 0;
+  }
+}
+
+@keyframes consoleGlow {
+  from {
+    opacity: 0.45;
+  }
+
+  to {
+    opacity: 0.82;
+  }
+}
+
+@keyframes consoleSweep {
+  50% {
+    transform: translateX(45%);
+  }
 }
 
 .radio-screen {
+  position: relative;
+  z-index: 1;
   padding: 14px;
   border: 1px solid rgba(51, 255, 204, 0.58);
   border-radius: 24px 10px 26px 10px;
@@ -778,7 +938,10 @@ a:focus-visible {
 }
 
 .radio-controls {
+  position: relative;
+  z-index: 1;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 12px;
@@ -786,7 +949,8 @@ a:focus-visible {
 }
 
 .radio-button,
-.radio-play {
+.radio-play,
+.radio-link {
   min-width: 48px;
   min-height: 40px;
   border: 1px solid rgba(255, 204, 102, 0.72);
@@ -802,21 +966,42 @@ a:focus-visible {
 }
 
 .radio-button:hover,
-.radio-play:hover {
+.radio-play:hover,
+.radio-link:hover {
   filter: brightness(1.16);
   transform: translateY(-1px);
 }
 
-.radio-play {
+.radio-play,
+.radio-link {
   display: grid;
   place-items: center;
   min-width: 82px;
 }
 
 .radio-button:disabled,
-.radio-play[aria-disabled="true"] {
+.radio-play:disabled,
+.radio-link[aria-disabled="true"] {
   cursor: not-allowed;
   opacity: 0.52;
+}
+
+.radio-volume {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: auto minmax(140px, 1fr);
+  gap: 12px;
+  align-items: center;
+  max-width: 360px;
+  margin: 12px auto 0;
+  color: var(--gold);
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 12px;
+}
+
+.radio-volume input {
+  accent-color: var(--green);
 }
 
 .radio-list {
@@ -922,6 +1107,15 @@ a:focus-visible {
     padding: 18px 14px;
   }
 
+  .signal-dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .radio-side,
+  .friends-side {
+    grid-column: auto;
+  }
+
   .friend-grid {
     grid-template-columns: 1fr;
   }
@@ -946,6 +1140,19 @@ a:focus-visible {
 
   .radio-player {
     grid-template-columns: 1fr;
+  }
+
+  .radio-shell {
+    min-height: auto;
+  }
+
+  .radio-art-stage {
+    min-height: 180px;
+  }
+
+  .radio-volume {
+    grid-template-columns: 1fr;
+    text-align: center;
   }
 }
 

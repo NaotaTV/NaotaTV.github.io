@@ -10,6 +10,10 @@
   var fallbackHonorable = { id: "lovesilks", username: "lovesilks", rank: 6, status: "HONORABLE TRANSMISSION" };
   var radioTracks = [];
   var selectedRadioIndex = 0;
+  var radioAudio = null;
+  var radioPlaybackWanted = true;
+  var radioUnlocked = false;
+  var radioDefaultVolume = 0.3;
   var apiOffline = false;
 
   function randomPercent() {
@@ -80,13 +84,22 @@
       .join("") || "?";
   }
 
+  function hashString(value) {
+    var hash = 0;
+    var text = String(value || "naotacord");
+    for (var i = 0; i < text.length; i += 1) {
+      hash = ((hash << 5) - hash + text.charCodeAt(i)) | 0;
+    }
+    return Math.abs(hash);
+  }
+
   function avatarMarkup(person, className) {
     var label = person.displayName || person.username || "UNKNOWN SIGNAL";
     if (person.avatarUrl) {
       return '<span class="' + className + '"><img loading="lazy" src="' + escapeHtml(person.avatarUrl) + '" alt="' + escapeHtml(label) + ' Discord avatar"></span>';
     }
 
-    return '<span class="' + className + '" aria-label="Unknown signal avatar">' + escapeHtml(getInitials(label)) + '</span>';
+    return '<span class="' + className + ' generated-avatar" style="--avatar-hue: ' + (hashString(person.id || label) % 360) + '" aria-label="' + escapeHtml(label) + ' generated profile picture"><span>' + escapeHtml(getInitials(label)) + '</span></span>';
   }
 
   function numberLabel(value) {
@@ -212,6 +225,7 @@
       list.innerHTML = '<li class="radio-empty">' + (apiOffline
         ? "Lain API tunnel is offline. The player is ready and waiting for lainapi.naotacord.com."
         : "Lainbot radio has not received any single-song requests under 10 minutes yet.") + '</li>';
+      stopRadioAudio();
       updateRadioDisplay();
       return;
     }
@@ -229,6 +243,7 @@
       '</li>';
     }).join("");
     updateRadioDisplay();
+    autoplayRadioWhenReady();
   }
 
   function updateRadioDisplay() {
@@ -237,9 +252,11 @@
     var duration = document.getElementById("radio-duration");
     var source = document.getElementById("radio-source");
     var open = document.getElementById("radio-open");
+    var play = document.getElementById("radio-play-toggle");
     var prev = document.getElementById("radio-prev");
     var next = document.getElementById("radio-next");
     var selected = radioTracks[selectedRadioIndex];
+    var playableUrl = selected ? getPlayableRadioUrl(selected) : "";
 
     document.querySelectorAll(".radio-track").forEach(function (button) {
       button.classList.toggle("is-selected", Number(button.getAttribute("data-radio-index")) === selectedRadioIndex);
@@ -254,6 +271,10 @@
         open.setAttribute("aria-disabled", "true");
         open.removeAttribute("href");
       }
+      if (play) {
+        play.textContent = "WAIT";
+        play.setAttribute("disabled", "");
+      }
       if (prev) prev.setAttribute("disabled", "");
       if (next) next.setAttribute("disabled", "");
       return;
@@ -263,6 +284,10 @@
     if (artist) artist.textContent = selected.artist || "Unknown Artist";
     if (duration) duration.textContent = formatDuration(selected.durationMs);
     if (source) source.textContent = (selected.sourceName || "Lainbot").toUpperCase();
+    if (play) {
+      play.removeAttribute("disabled");
+      play.textContent = radioAudio && !radioAudio.paused ? "PAUSE" : (playableUrl ? "PLAY" : "OPEN");
+    }
     if (open) {
       if (selected.uri) {
         open.href = selected.uri;
@@ -274,6 +299,120 @@
     }
     if (prev) prev.toggleAttribute("disabled", radioTracks.length < 2);
     if (next) next.toggleAttribute("disabled", radioTracks.length < 2);
+  }
+
+  function getPlayableRadioUrl(track) {
+    var candidates = [
+      track && track.audioUrl,
+      track && track.streamUrl,
+      track && track.previewUrl,
+      track && track.uri
+    ].filter(Boolean);
+
+    for (var i = 0; i < candidates.length; i += 1) {
+      if (/\.(mp3|m4a|ogg|opus|wav)(\?|#|$)/i.test(candidates[i]) || /^blob:|^data:audio\//i.test(candidates[i])) {
+        return candidates[i];
+      }
+    }
+
+    return "";
+  }
+
+  function ensureRadioAudio() {
+    if (radioAudio) {
+      return radioAudio;
+    }
+
+    radioAudio = document.getElementById("radio-audio") || document.createElement("audio");
+    radioAudio.volume = radioDefaultVolume;
+    radioAudio.loop = false;
+    radioAudio.addEventListener("play", function () {
+      radioUnlocked = true;
+      updateRadioDisplay();
+    });
+    radioAudio.addEventListener("pause", updateRadioDisplay);
+    radioAudio.addEventListener("ended", function () {
+      if (!radioTracks.length || !radioPlaybackWanted) {
+        return;
+      }
+      selectedRadioIndex = (selectedRadioIndex + 1) % radioTracks.length;
+      updateRadioDisplay();
+      playSelectedRadioTrack();
+    });
+    radioAudio.addEventListener("error", function () {
+      setRadioStatus("Signal source cannot stream in-browser. OPEN still works.");
+      updateRadioDisplay();
+    });
+    return radioAudio;
+  }
+
+  function setRadioStatus(message) {
+    var artist = document.getElementById("radio-artist");
+    if (artist && message) {
+      artist.textContent = message;
+    }
+  }
+
+  function stopRadioAudio() {
+    if (!radioAudio) {
+      return;
+    }
+    radioAudio.pause();
+    radioAudio.removeAttribute("src");
+    radioAudio.load();
+  }
+
+  function playSelectedRadioTrack() {
+    var selected = radioTracks[selectedRadioIndex];
+    var playableUrl = getPlayableRadioUrl(selected);
+    var audio = ensureRadioAudio();
+
+    radioPlaybackWanted = true;
+
+    if (!selected) {
+      updateRadioDisplay();
+      return;
+    }
+
+    if (!playableUrl) {
+      setRadioStatus("Tap OPEN for this source; autoplay is armed for direct audio signals.");
+      updateRadioDisplay();
+      return;
+    }
+
+    if (audio.src !== playableUrl) {
+      audio.src = playableUrl;
+    }
+    audio.volume = radioDefaultVolume;
+
+    var playPromise = audio.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise
+        .then(function () {
+          radioUnlocked = true;
+          updateRadioDisplay();
+        })
+        .catch(function () {
+          setRadioStatus("Tap PLAY once to unlock radio autoplay.");
+          updateRadioDisplay();
+        });
+    }
+  }
+
+  function pauseRadio() {
+    radioPlaybackWanted = false;
+    if (radioAudio) {
+      radioAudio.pause();
+    }
+    updateRadioDisplay();
+  }
+
+  function autoplayRadioWhenReady() {
+    window.setTimeout(function () {
+      if (radioPlaybackWanted && radioTracks.length) {
+        playSelectedRadioTrack();
+      }
+    }, 350);
   }
 
   function formatDuration(durationMs) {
@@ -327,6 +466,11 @@
     var list = document.getElementById("radio-list");
     var prev = document.getElementById("radio-prev");
     var next = document.getElementById("radio-next");
+    var play = document.getElementById("radio-play-toggle");
+    var volume = document.getElementById("radio-volume");
+    var volumeLabel = document.getElementById("radio-volume-label");
+
+    ensureRadioAudio();
 
     if (list) {
       list.addEventListener("click", function (event) {
@@ -337,6 +481,37 @@
 
         selectedRadioIndex = Number(button.getAttribute("data-radio-index")) || 0;
         updateRadioDisplay();
+        playSelectedRadioTrack();
+      });
+    }
+
+    if (play) {
+      play.addEventListener("click", function () {
+        var selected = radioTracks[selectedRadioIndex];
+        var playableUrl = getPlayableRadioUrl(selected);
+        if (!playableUrl && selected && selected.uri) {
+          window.open(selected.uri, "_blank", "noopener,noreferrer");
+          return;
+        }
+
+        if (radioAudio && !radioAudio.paused) {
+          pauseRadio();
+        } else {
+          playSelectedRadioTrack();
+        }
+      });
+    }
+
+    if (volume) {
+      volume.value = String(Math.round(radioDefaultVolume * 100));
+      volume.addEventListener("input", function () {
+        radioDefaultVolume = Math.max(0, Math.min(1, Number(volume.value) / 100));
+        if (radioAudio) {
+          radioAudio.volume = radioDefaultVolume;
+        }
+        if (volumeLabel) {
+          volumeLabel.textContent = "VOL " + Math.round(radioDefaultVolume * 100) + "%";
+        }
       });
     }
 
@@ -345,6 +520,9 @@
         if (!radioTracks.length) return;
         selectedRadioIndex = (selectedRadioIndex - 1 + radioTracks.length) % radioTracks.length;
         updateRadioDisplay();
+        if (radioPlaybackWanted || radioUnlocked) {
+          playSelectedRadioTrack();
+        }
       });
     }
 
@@ -353,6 +531,9 @@
         if (!radioTracks.length) return;
         selectedRadioIndex = (selectedRadioIndex + 1) % radioTracks.length;
         updateRadioDisplay();
+        if (radioPlaybackWanted || radioUnlocked) {
+          playSelectedRadioTrack();
+        }
       });
     }
   }

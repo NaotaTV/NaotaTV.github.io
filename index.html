@@ -6,6 +6,7 @@
   <title>Naotacord - How and When It May Be Entered</title>
   <meta name="description" content="How and When Naotacord, the Door to the Physical Kingdom Level Above Human, May Be Entered.">
   <meta name="keywords" content="Naotacord">
+  <link rel="preload" as="image" href="assets/naotacord-radio-console.png">
   <link rel="stylesheet" href="styles.css">
   <script src="script.js" defer></script>
 </head>
@@ -75,16 +76,72 @@
       </ul>
     </section>
 
-    <section class="social-transmissions reveal" aria-labelledby="friends-heading">
-      <div class="section-console">
-        <p class="console-label">TRANSMISSION ACTIVE</p>
-        <h1 id="friends-heading" class="cosmic-title">&#9733; BEST FRIENDS ON EARTH &#9733;</h1>
-        <p class="console-copy">Friendship database awaiting direct Lainbot signal. Fallback ranking is displayed until the feed is connected.</p>
-      </div>
+    <section class="signal-dashboard reveal" aria-label="Naotacord live signal dashboard">
+      <section class="radio-transmissions dashboard-panel radio-side" aria-labelledby="radio-heading">
+        <div class="section-console">
+          <p class="console-label">CONNECTED VIA THE WORLD WIDE WEB</p>
+          <h1 id="radio-heading" class="cosmic-title">NAOTACORD RADIO</h1>
+          <p class="console-copy">Last 20 single-song requests under 10 minutes, transmitted by Lainbot. Default volume: 30%.</p>
+        </div>
 
-      <ol id="friend-grid" class="friend-grid" aria-live="polite"></ol>
+        <div class="radio-player" aria-live="polite">
+          <div class="radio-shell">
+            <div class="radio-art-stage" aria-hidden="true">
+              <img class="radio-console-image" src="assets/naotacord-radio-console.png" alt="">
+              <span class="radio-console-scan"></span>
+              <span class="radio-console-glow"></span>
+            </div>
 
-      <div class="honorable-card" id="honorable-transmission" aria-live="polite"></div>
+            <div class="radio-screen">
+              <div class="radio-lcd">
+                <span class="radio-kicker">NOW TUNING</span>
+                <h2 id="radio-title">Awaiting signal</h2>
+                <p id="radio-artist">Lainbot radio feed offline</p>
+                <div class="radio-meta">
+                  <span id="radio-duration">00:00</span>
+                  <span id="radio-source">EARTH NODE</span>
+                </div>
+              </div>
+
+              <div class="wire-visualizer" aria-hidden="true">
+                <canvas id="radio-visualizer" width="420" height="160"></canvas>
+                <div class="wire-bars">
+                  <span></span><span></span><span></span><span></span><span></span><span></span>
+                  <span></span><span></span><span></span><span></span><span></span><span></span>
+                </div>
+              </div>
+            </div>
+
+            <audio id="radio-audio" preload="metadata" loop></audio>
+
+            <div class="radio-controls">
+              <button id="radio-prev" class="radio-button" type="button" aria-label="Previous radio entry">&#9664;</button>
+              <button id="radio-play-toggle" class="radio-play" type="button" aria-label="Play Naotacord radio">PLAY</button>
+              <button id="radio-next" class="radio-button" type="button" aria-label="Next radio entry">&#9654;</button>
+              <a id="radio-open" class="radio-link" href="#" target="_blank" rel="noopener noreferrer" aria-label="Open selected song">OPEN</a>
+            </div>
+
+            <div class="radio-volume" aria-label="Radio volume">
+              <span id="radio-volume-label">VOL 30%</span>
+              <input id="radio-volume" type="range" min="0" max="100" value="30">
+            </div>
+          </div>
+
+          <ol id="radio-list" class="radio-list"></ol>
+        </div>
+      </section>
+
+      <section class="social-transmissions dashboard-panel friends-side" aria-labelledby="friends-heading">
+        <div class="section-console">
+          <p class="console-label">TRANSMISSION ACTIVE</p>
+          <h1 id="friends-heading" class="cosmic-title">&#9733; BEST FRIENDS ON EARTH &#9733;</h1>
+          <p class="console-copy">Friendship database awaiting direct Lainbot signal. Fallback ranking is displayed until the feed is connected.</p>
+        </div>
+
+        <ol id="friend-grid" class="friend-grid" aria-live="polite"></ol>
+
+        <div class="honorable-card" id="honorable-transmission" aria-live="polite"></div>
+      </section>
     </section>
 
     <section class="counter-transmissions reveal" aria-labelledby="counter-heading">
@@ -114,48 +171,6 @@
           </table>
           <p id="word-counter-empty" class="empty-signal" hidden>Lainbot counter feed is not connected yet. No live statistics are being shown.</p>
         </div>
-      </div>
-    </section>
-
-    <section class="radio-transmissions reveal" aria-labelledby="radio-heading">
-      <div class="section-console">
-        <p class="console-label">CONNECTED VIA THE WORLD WIDE WEB</p>
-        <h1 id="radio-heading" class="cosmic-title">NAOTACORD RADIO</h1>
-        <p class="console-copy">Last 20 single-song requests under 10 minutes, transmitted by Lainbot.</p>
-      </div>
-
-      <div class="radio-player" aria-live="polite">
-        <div class="radio-shell">
-          <div class="radio-antenna" aria-hidden="true"></div>
-          <div class="radio-orb" aria-hidden="true"></div>
-          <div class="radio-screen">
-            <div class="radio-lcd">
-              <span class="radio-kicker">NOW TUNING</span>
-              <h2 id="radio-title">Awaiting signal</h2>
-              <p id="radio-artist">Lainbot radio feed offline</p>
-              <div class="radio-meta">
-                <span id="radio-duration">00:00</span>
-                <span id="radio-source">EARTH NODE</span>
-              </div>
-            </div>
-
-            <div class="wire-visualizer" aria-hidden="true">
-              <canvas id="radio-visualizer" width="420" height="160"></canvas>
-              <div class="wire-bars">
-                <span></span><span></span><span></span><span></span><span></span><span></span>
-                <span></span><span></span><span></span><span></span><span></span><span></span>
-              </div>
-            </div>
-          </div>
-
-          <div class="radio-controls">
-            <button id="radio-prev" class="radio-button" type="button" aria-label="Previous radio entry">&#9664;</button>
-            <a id="radio-open" class="radio-play" href="#" target="_blank" rel="noopener noreferrer" aria-label="Open selected song">PLAY</a>
-            <button id="radio-next" class="radio-button" type="button" aria-label="Next radio entry">&#9654;</button>
-          </div>
-        </div>
-
-        <ol id="radio-list" class="radio-list"></ol>
       </div>
     </section>
 
