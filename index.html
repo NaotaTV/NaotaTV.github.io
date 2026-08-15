@@ -6,9 +6,9 @@
   <title>Naotacord - How and When It May Be Entered</title>
   <meta name="description" content="How and When Naotacord, the Door to the Physical Kingdom Level Above Human, May Be Entered.">
   <meta name="keywords" content="Naotacord">
-  <link rel="preload" as="image" href="assets/naotacord-radio-console.png?v=20260815-radio">
-  <link rel="stylesheet" href="styles.css?v=20260815-radio">
-  <script src="script.js?v=20260815-radio" defer></script>
+  <link rel="preload" as="image" href="assets/naotacord-radio-console.png?v=20260815-station">
+  <link rel="stylesheet" href="styles.css?v=20260815-station">
+  <script src="script.js?v=20260815-station" defer></script>
 </head>
 <body>
   <div id="stars-container" aria-hidden="true"></div>
@@ -81,7 +81,7 @@
         <div class="section-console">
           <p class="console-label">CONNECTED VIA THE WORLD WIDE WEB</p>
           <h1 id="radio-heading" class="cosmic-title">NAOTACORD RADIO</h1>
-          <p class="console-copy">Last 20 single-song requests under 10 minutes, transmitted by Lainbot. Default volume: 30%.</p>
+          <p class="console-copy">A shared Lainbot station built from the last 20 single-song requests under 10 minutes. Everyone tunes into the same moment. Default volume: 30%.</p>
         </div>
 
         <div class="radio-player" aria-live="polite">
@@ -94,12 +94,12 @@
 
             <div class="radio-screen">
               <div class="radio-lcd">
-                <span class="radio-kicker">NOW TUNING</span>
+                <span class="radio-kicker">NAOTACORD RADIO · LIVE</span>
                 <h2 id="radio-title">Awaiting signal</h2>
                 <p id="radio-artist">Lainbot radio feed offline</p>
                 <div class="radio-meta">
                   <span id="radio-duration">00:00</span>
-                  <span id="radio-source">EARTH NODE</span>
+                  <span id="radio-source">SHARED STATION</span>
                 </div>
               </div>
 
@@ -115,11 +115,10 @@
             <audio id="radio-audio" preload="metadata" loop></audio>
             <iframe id="radio-youtube-frame" class="radio-youtube-frame" title="Naotacord radio YouTube stream" allow="autoplay; encrypted-media" loading="lazy"></iframe>
 
-            <div class="radio-controls">
-              <button id="radio-prev" class="radio-button" type="button" aria-label="Previous radio entry">&#9664;</button>
+            <div class="radio-controls" aria-label="Naotacord radio controls">
+              <button id="radio-live" class="radio-button radio-live" type="button" aria-label="Retune to live radio">LIVE</button>
               <button id="radio-play-toggle" class="radio-play" type="button" aria-label="Play Naotacord radio">PLAY</button>
-              <button id="radio-next" class="radio-button" type="button" aria-label="Next radio entry">&#9654;</button>
-              <a id="radio-open" class="radio-link" href="#" target="_blank" rel="noopener noreferrer" aria-label="Open selected song">OPEN</a>
+              <a id="radio-open" class="radio-link" href="#" target="_blank" rel="noopener noreferrer" aria-label="Open current song source">OPEN</a>
             </div>
 
             <div class="radio-volume" aria-label="Radio volume">
@@ -128,7 +127,7 @@
             </div>
           </div>
 
-          <ol id="radio-list" class="radio-list"></ol>
+          <p id="radio-station-note" class="radio-station-note" aria-live="polite">Station clock waiting for Lainbot.</p>
         </div>
       </section>
 

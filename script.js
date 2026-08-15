@@ -16,6 +16,9 @@
   var radioDefaultVolume = 0.3;
   var radioYouTubePlaying = false;
   var radioFrameTimer = null;
+  var radioSyncTimer = null;
+  var radioStationEpoch = Date.UTC(2026, 0, 1, 0, 0, 0);
+  var radioFallbackDurationMs = 180000;
   var apiOffline = false;
 
   function randomPercent() {
@@ -214,38 +217,90 @@
 
   function renderRadio(data) {
     var player = document.querySelector(".radio-player");
-    var list = document.getElementById("radio-list");
-    if (!player || !list) {
+    var note = document.getElementById("radio-station-note");
+    if (!player) {
       return;
     }
 
-    radioTracks = Array.isArray(data.tracks) ? data.tracks.slice(0, 20) : [];
-    selectedRadioIndex = 0;
+    radioTracks = normalizeRadioTracks(data.tracks);
+    var position = getSyncedRadioPosition();
+    selectedRadioIndex = position.index;
     player.classList.add("is-active");
 
     if (!radioTracks.length) {
-      list.innerHTML = '<li class="radio-empty">' + (apiOffline
+      if (note) note.textContent = apiOffline
         ? "Lain API tunnel is offline. The player is ready and waiting for lainapi.naotacord.com."
-        : "Lainbot radio has not received any single-song requests under 10 minutes yet.") + '</li>';
+        : "Lainbot radio has not received any single-song requests under 10 minutes yet.";
       stopRadioAudio();
       updateRadioDisplay();
       return;
     }
 
-    list.innerHTML = radioTracks.map(function (track, index) {
-      return '<li>' +
-        '<button class="radio-track' + (index === 0 ? " is-selected" : "") + '" type="button" data-radio-index="' + index + '">' +
-          '<span class="radio-track-index">' + String(index + 1).padStart(2, "0") + '</span>' +
-          '<span>' +
-            '<span class="radio-track-title">' + escapeHtml(track.title || "Untitled Signal") + '</span>' +
-            '<span class="radio-track-artist">' + escapeHtml(track.artist || "Unknown Artist") + '</span>' +
-          '</span>' +
-          '<span class="radio-track-duration">' + formatDuration(track.durationMs) + '</span>' +
-        '</button>' +
-      '</li>';
-    }).join("");
+    if (note) note.textContent = "Live station locked to the last " + radioTracks.length + " Lainbot single-song request" + (radioTracks.length === 1 ? "." : "s.");
     updateRadioDisplay();
+    scheduleRadioSync();
     autoplayRadioWhenReady();
+  }
+
+  function normalizeRadioTracks(tracks) {
+    return (Array.isArray(tracks) ? tracks : [])
+      .filter(function (track) {
+        return track && (!track.durationMs || track.durationMs <= 10 * 60 * 1000);
+      })
+      .slice(0, 20)
+      .map(function (track) {
+        var duration = typeof track.durationMs === "number" && track.durationMs > 0
+          ? Math.min(track.durationMs, 10 * 60 * 1000)
+          : radioFallbackDurationMs;
+        return Object.assign({}, track, { durationMs: duration });
+      });
+  }
+
+  function getSyncedRadioPosition() {
+    if (!radioTracks.length) {
+      return { index: 0, offsetMs: 0, cycleMs: 0 };
+    }
+
+    var cycleMs = radioTracks.reduce(function (sum, track) {
+      return sum + track.durationMs;
+    }, 0);
+    var elapsed = ((Date.now() - radioStationEpoch) % cycleMs + cycleMs) % cycleMs;
+
+    for (var index = 0; index < radioTracks.length; index += 1) {
+      var duration = radioTracks[index].durationMs;
+      if (elapsed < duration) {
+        return { index: index, offsetMs: elapsed, cycleMs: cycleMs };
+      }
+      elapsed -= duration;
+    }
+
+    return { index: 0, offsetMs: 0, cycleMs: cycleMs };
+  }
+
+  function syncRadioToStationClock() {
+    if (!radioTracks.length) {
+      updateRadioDisplay();
+      return { indexChanged: false, offsetMs: 0 };
+    }
+
+    var previousIndex = selectedRadioIndex;
+    var position = getSyncedRadioPosition();
+    selectedRadioIndex = position.index;
+    updateRadioDisplay(position.offsetMs);
+    return { indexChanged: previousIndex !== selectedRadioIndex, offsetMs: position.offsetMs };
+  }
+
+  function scheduleRadioSync() {
+    if (radioSyncTimer) {
+      window.clearInterval(radioSyncTimer);
+    }
+
+    radioSyncTimer = window.setInterval(function () {
+      var sync = syncRadioToStationClock();
+      if ((radioPlaybackWanted || radioUnlocked) && sync.indexChanged) {
+        playSelectedRadioTrack(sync.offsetMs);
+      }
+    }, 1000);
   }
 
   function updateRadioDisplay() {
@@ -255,21 +310,17 @@
     var source = document.getElementById("radio-source");
     var open = document.getElementById("radio-open");
     var play = document.getElementById("radio-play-toggle");
-    var prev = document.getElementById("radio-prev");
-    var next = document.getElementById("radio-next");
+    var live = document.getElementById("radio-live");
     var selected = radioTracks[selectedRadioIndex];
     var playableUrl = selected ? getPlayableRadioUrl(selected) : "";
     var youtubeId = selected ? getYouTubeVideoId(selected.uri) : "";
-
-    document.querySelectorAll(".radio-track").forEach(function (button) {
-      button.classList.toggle("is-selected", Number(button.getAttribute("data-radio-index")) === selectedRadioIndex);
-    });
+    var offsetMs = typeof arguments[0] === "number" ? arguments[0] : getSyncedRadioPosition().offsetMs;
 
     if (!selected) {
       if (title) title.textContent = "Awaiting signal";
       if (artist) artist.textContent = "Lainbot radio feed offline";
       if (duration) duration.textContent = "00:00";
-      if (source) source.textContent = "EARTH NODE";
+      if (source) source.textContent = "SHARED STATION";
       if (open) {
         open.setAttribute("aria-disabled", "true");
         open.removeAttribute("href");
@@ -278,15 +329,14 @@
         play.textContent = "WAIT";
         play.setAttribute("disabled", "");
       }
-      if (prev) prev.setAttribute("disabled", "");
-      if (next) next.setAttribute("disabled", "");
+      if (live) live.setAttribute("disabled", "");
       return;
     }
 
     if (title) title.textContent = selected.title || "Untitled Signal";
     if (artist) artist.textContent = selected.artist || "Unknown Artist";
-    if (duration) duration.textContent = formatDuration(selected.durationMs);
-    if (source) source.textContent = (selected.sourceName || "Lainbot").toUpperCase();
+    if (duration) duration.textContent = formatDuration(offsetMs) + " / " + formatDuration(selected.durationMs);
+    if (source) source.textContent = "LIVE · " + (selected.sourceName || "LAINBOT").toUpperCase();
     if (play) {
       play.removeAttribute("disabled");
       play.textContent = (radioAudio && !radioAudio.paused) || radioYouTubePlaying ? "PAUSE" : (playableUrl || youtubeId ? "PLAY" : "OPEN");
@@ -300,8 +350,7 @@
         open.removeAttribute("href");
       }
     }
-    if (prev) prev.toggleAttribute("disabled", radioTracks.length < 2);
-    if (next) next.toggleAttribute("disabled", radioTracks.length < 2);
+    if (live) live.removeAttribute("disabled");
   }
 
   function getPlayableRadioUrl(track) {
@@ -360,12 +409,7 @@
     });
     radioAudio.addEventListener("pause", updateRadioDisplay);
     radioAudio.addEventListener("ended", function () {
-      if (!radioTracks.length || !radioPlaybackWanted) {
-        return;
-      }
-      selectedRadioIndex = (selectedRadioIndex + 1) % radioTracks.length;
-      updateRadioDisplay();
-      playSelectedRadioTrack();
+      if (radioPlaybackWanted) playSelectedRadioTrack();
     });
     radioAudio.addEventListener("error", function () {
       setRadioStatus("Signal source cannot stream in-browser. OPEN still works.");
@@ -403,7 +447,7 @@
     radioYouTubePlaying = false;
   }
 
-  function playYouTubeTrack(track) {
+  function playYouTubeTrack(track, offsetMs) {
     var videoId = getYouTubeVideoId(track && track.uri);
     var frame = document.getElementById("radio-youtube-frame");
     if (!videoId || !frame) {
@@ -415,8 +459,9 @@
       window.clearTimeout(radioFrameTimer);
     }
 
+    var startSeconds = Math.max(0, Math.floor((offsetMs || 0) / 1000));
     frame.src = "https://www.youtube.com/embed/" + encodeURIComponent(videoId) +
-      "?autoplay=1&loop=1&playlist=" + encodeURIComponent(videoId) +
+      "?autoplay=1&start=" + encodeURIComponent(startSeconds) +
       "&controls=0&playsinline=1&rel=0&enablejsapi=1&origin=" + encodeURIComponent(window.location.origin);
     radioYouTubePlaying = true;
     radioUnlocked = true;
@@ -427,15 +472,10 @@
       sendYouTubeCommand("playVideo", []);
     }, 900);
 
-    if (radioTracks.length > 1 && typeof track.durationMs === "number" && track.durationMs > 0) {
+    if (typeof track.durationMs === "number" && track.durationMs > 0) {
       radioFrameTimer = window.setTimeout(function () {
-        if (!radioPlaybackWanted) {
-          return;
-        }
-        selectedRadioIndex = (selectedRadioIndex + 1) % radioTracks.length;
-        updateRadioDisplay();
-        playSelectedRadioTrack();
-      }, track.durationMs + 1200);
+        if (radioPlaybackWanted) playSelectedRadioTrack();
+      }, Math.max(1200, track.durationMs - (offsetMs || 0) + 900));
     }
 
     updateRadioDisplay();
@@ -455,8 +495,10 @@
     }), "https://www.youtube.com");
   }
 
-  function playSelectedRadioTrack() {
+  function playSelectedRadioTrack(offsetMs) {
+    var sync = syncRadioToStationClock();
     var selected = radioTracks[selectedRadioIndex];
+    var liveOffsetMs = typeof offsetMs === "number" ? offsetMs : sync.offsetMs;
     var playableUrl = getPlayableRadioUrl(selected);
     var audio = ensureRadioAudio();
 
@@ -468,10 +510,10 @@
     }
 
     if (!playableUrl) {
-      if (playYouTubeTrack(selected)) {
+      if (playYouTubeTrack(selected, liveOffsetMs)) {
         return;
       }
-      setRadioStatus("Tap OPEN for this source; autoplay is armed for direct audio signals.");
+      setRadioStatus("This source cannot stream in-browser. OPEN still works.");
       updateRadioDisplay();
       return;
     }
@@ -481,6 +523,15 @@
       audio.src = playableUrl;
     }
     audio.volume = radioDefaultVolume;
+    if (Number.isFinite(audio.duration) && audio.duration > 0) {
+      audio.currentTime = Math.min(audio.duration - 0.35, Math.max(0, liveOffsetMs / 1000));
+    } else {
+      audio.addEventListener("loadedmetadata", function seekLive() {
+        if (Number.isFinite(audio.duration) && audio.duration > 0) {
+          audio.currentTime = Math.min(audio.duration - 0.35, Math.max(0, liveOffsetMs / 1000));
+        }
+      }, { once: true });
+    }
 
     var playPromise = audio.play();
     if (playPromise && typeof playPromise.catch === "function") {
@@ -561,27 +612,12 @@
   }
 
   function setupRadioControls() {
-    var list = document.getElementById("radio-list");
-    var prev = document.getElementById("radio-prev");
-    var next = document.getElementById("radio-next");
+    var live = document.getElementById("radio-live");
     var play = document.getElementById("radio-play-toggle");
     var volume = document.getElementById("radio-volume");
     var volumeLabel = document.getElementById("radio-volume-label");
 
     ensureRadioAudio();
-
-    if (list) {
-      list.addEventListener("click", function (event) {
-        var button = event.target.closest(".radio-track");
-        if (!button) {
-          return;
-        }
-
-        selectedRadioIndex = Number(button.getAttribute("data-radio-index")) || 0;
-        updateRadioDisplay();
-        playSelectedRadioTrack();
-      });
-    }
 
     if (play) {
       play.addEventListener("click", function () {
@@ -615,25 +651,10 @@
       });
     }
 
-    if (prev) {
-      prev.addEventListener("click", function () {
+    if (live) {
+      live.addEventListener("click", function () {
         if (!radioTracks.length) return;
-        selectedRadioIndex = (selectedRadioIndex - 1 + radioTracks.length) % radioTracks.length;
-        updateRadioDisplay();
-        if (radioPlaybackWanted || radioUnlocked) {
-          playSelectedRadioTrack();
-        }
-      });
-    }
-
-    if (next) {
-      next.addEventListener("click", function () {
-        if (!radioTracks.length) return;
-        selectedRadioIndex = (selectedRadioIndex + 1) % radioTracks.length;
-        updateRadioDisplay();
-        if (radioPlaybackWanted || radioUnlocked) {
-          playSelectedRadioTrack();
-        }
+        playSelectedRadioTrack();
       });
     }
   }
