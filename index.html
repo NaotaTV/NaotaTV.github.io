@@ -75,6 +75,48 @@
       </ul>
     </section>
 
+    <section class="social-transmissions reveal" aria-labelledby="friends-heading">
+      <div class="section-console">
+        <p class="console-label">TRANSMISSION ACTIVE</p>
+        <h1 id="friends-heading" class="cosmic-title">&#9733; BEST FRIENDS ON EARTH &#9733;</h1>
+        <p class="console-copy">Friendship database awaiting direct Lainbot signal. Fallback ranking is displayed until the feed is connected.</p>
+      </div>
+
+      <ol id="friend-grid" class="friend-grid" aria-live="polite"></ol>
+
+      <div class="honorable-card" id="honorable-transmission" aria-live="polite"></div>
+    </section>
+
+    <section class="counter-transmissions reveal" aria-labelledby="counter-heading">
+      <div class="section-console">
+        <p class="console-label">CELESTIAL NETWORK STATISTICS</p>
+        <h1 id="counter-heading" class="cosmic-title">N-WORD COUNTER</h1>
+        <p class="console-copy">Old internet leaderboard shell. Counts appear only when Lainbot supplies real data.</p>
+      </div>
+
+      <div class="counter-panel">
+        <div class="counter-summary">
+          <span>WORDS DETECTED</span>
+          <div id="detected-counter" class="digit-counter" aria-label="Words detected counter"></div>
+        </div>
+
+        <div class="leaderboard-wrap">
+          <table class="leaderboard">
+            <caption>N-Word Transmission Database</caption>
+            <thead>
+              <tr>
+                <th scope="col">Rank</th>
+                <th scope="col">User</th>
+                <th scope="col">Count</th>
+              </tr>
+            </thead>
+            <tbody id="word-counter-rows"></tbody>
+          </table>
+          <p id="word-counter-empty" class="empty-signal" hidden>Lainbot counter feed is not connected yet. No live statistics are being shown.</p>
+        </div>
+      </div>
+    </section>
+
     <footer class="site-footer">
       <img src="srhg.png" alt="Saturn Rings">
       <hr class="divider wide">
