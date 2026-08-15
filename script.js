@@ -1,31 +1,43 @@
-function createStars() {
-  const container = document.getElementById("stars-container");
-  const numStars = 50; // Number of stars to create
-
-  for (let i = 0; i < numStars; i++) {
-    const star = document.createElement("div");
-    star.className = "star";
-    star.style.left = `${getRandomPosition()}px`;
-    star.style.top = `${getRandomPosition()}px`;
-    star.style.animationDelay = `${getRandomDelay()}s`;
-    container.appendChild(star);
+(function () {
+  function randomPercent() {
+    return Math.random() * 100;
   }
 
-  setTimeout(() => {
-    container.innerHTML = ""; // Clear the stars after 3 seconds
-  }, 3000);
-}
+  function randomItem(items) {
+    return items[Math.floor(Math.random() * items.length)];
+  }
 
-function getRandomPosition() {
-  const min = 0;
-  const max = 500; // Adjust the maximum value based on your container size
-  return Math.random() * (max - min) + min;
-}
+  function createStars() {
+    var container = document.getElementById("stars-container");
+    if (!container) {
+      return;
+    }
 
-function getRandomDelay() {
-  const min = 0;
-  const max = 2; // Adjust the maximum delay value as needed
-  return Math.random() * (max - min) + min;
-}
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      container.replaceChildren();
+      return;
+    }
 
-createStars();
+    var colors = ["red", "white", "green"];
+    var stars = document.createDocumentFragment();
+
+    for (var i = 0; i < 100; i += 1) {
+      var star = document.createElement("span");
+      star.className = "star";
+      star.style.left = randomPercent() + "%";
+      star.style.top = randomPercent() + "%";
+      star.style.backgroundColor = randomItem(colors);
+      star.style.animationDelay = Math.random() * 2 + "s";
+      star.style.animationDuration = 0.8 + Math.random() * 1.4 + "s";
+      stars.appendChild(star);
+    }
+
+    container.replaceChildren(stars);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", createStars, { once: true });
+  } else {
+    createStars();
+  }
+}());
